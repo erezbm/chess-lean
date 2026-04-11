@@ -1,2 +1,5 @@
 #!/usr/bin/env bash
-lake exe chess-lean
+set -e
+
+lake build &>/dev/null
+script -c "lake env chess-lean" --quiet --flush log.txt
