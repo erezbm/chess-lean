@@ -1,0 +1,5 @@
+- [x] Basic UCI protocol
+- [ ] Model Chess in Lean (incremental)
+  - [x] Basic Board, Piece
+  - [ ] On `ucinewgame` initialize default position
+- [ ] Basic bot moving strategy: first eligible move
