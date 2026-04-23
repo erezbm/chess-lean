@@ -1,3 +1,4 @@
 -- This module serves as the root of the `ChessLean` library.
 -- Import modules here that should be built as part of the library.
+import ChessLean.Chess
 import ChessLean.UCI
