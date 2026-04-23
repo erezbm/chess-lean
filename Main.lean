@@ -1,29 +1,15 @@
 import ChessLean
 
-
-def handleClientToEngineCommand : ClientToEngineCommand → Option EngineToClientCommand
-  | .uci =>  pure .uciok
-  | .isready => pure .readyok
-  | .go => pure .bestmove
-  | _ => none
-
-def generateEngineResponse : EngineToClientCommand → List String
-  | .uciok => ["id name Chess Lean", "id author Erez and Tamir", "uciok"]
-  | .readyok  => ["readyok"]
-  | .bestmove => ["bestmove e2e4"]
-
-def parseClientToEngineCommand : String → Option ClientToEngineCommand
-  | "uci" => pure .uci
-  | "isready" => pure .isready
-  | "ucinewgame" => pure .ucinewgame
-  | "stop" => pure .stop
-  | "quit" => pure .quit
-  | s => if s.startsWith "go" then pure .go else none
+def handleClientToEngineCommand : ClientToEngineCommand → Array EngineToClientCommand
+  | .uci => #[.id "name Chess Lean", .id "author Erez and Tamir", .uciok]
+  | .isready => #[.readyok]
+  | .go _ => #[.bestmove "e2e4"]
+| _ => #[]
 
 def main : IO Unit := do
   repeat
     let line ← (← IO.getStdin).getLine
-    let some clientCmd := parseClientToEngineCommand line.trimAscii.toString | continue
-    let some engineCmd := handleClientToEngineCommand clientCmd | continue
-    for response in generateEngineResponse engineCmd do
-      IO.println response
+    let some clientCmd := ClientToEngineCommand.parse line.trimAscii.toString | continue
+    let engineCmds := handleClientToEngineCommand clientCmd
+    for engineCmd in engineCmds do
+      IO.println engineCmd
