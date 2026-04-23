@@ -20,10 +20,10 @@ def parseClientToEngineCommand : String → Option ClientToEngineCommand
   | "quit" => pure .quit
   | s => if s.startsWith "go" then pure .go else none
 
-def main : IO Unit := do repeat
-  Functor.mapConst () $ OptionT.run do
+def main : IO Unit := do
+  repeat
     let line ← (← IO.getStdin).getLine
-    let clientCmd ← liftOption $ parseClientToEngineCommand line.trimAscii.toString
-    let engineCmd ← liftOption $ handleClientToEngineCommand clientCmd
+    let some clientCmd := parseClientToEngineCommand line.trimAscii.toString | continue
+    let some engineCmd := handleClientToEngineCommand clientCmd | continue
     for response in generateEngineResponse engineCmd do
       IO.println response
