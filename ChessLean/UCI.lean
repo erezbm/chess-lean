@@ -19,10 +19,12 @@ def ClientToEngineCommand.parse (line : String) : Option ClientToEngineCommand :
     | "quit" => pure .quit
     | "go" => pure $ .go args
     | "position" =>
-        match (← args[0]?) with
-          | "startpos" => pure $ .position #[] args[2:].toArray
-          | "fen" => pure $ .position args[1:7].toArray args[9:].toArray
+        let (pos, moves) <- match (← args[0]?) with
+          | "startpos" => pure (#[], args[1:])
+          | "fen" => pure (args[1:7].toArray, args[8:])
           | _ => failure
+        if moves.getD 0 "moves" != "moves" then failure
+        pure $ .position pos moves[1:].toArray
     | _ => failure
 
 inductive EngineToClientCommand : Type where
