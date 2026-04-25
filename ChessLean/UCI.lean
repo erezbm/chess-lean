@@ -2,18 +2,28 @@ inductive ClientToEngineCommand : Type where
   | uci
   | isready
   | ucinewgame
-  | go (s : String)
+  | position (position : Array String) (moves : Array String)
+  | go (args : Array String)
   | stop
   | quit
 
-def ClientToEngineCommand.parse : (line : String) → Option ClientToEngineCommand
-  | "uci" => pure .uci
-  | "isready" => pure .isready
-  | "ucinewgame" => pure .ucinewgame
-  | "stop" => pure .stop
-  | "quit" => pure .quit
-  | s => if s.startsWith "go" then pure (.go (s.dropPrefix "go").trimAscii.toString) else none
-
+def ClientToEngineCommand.parse (line : String) : Option ClientToEngineCommand := do
+  let words := ((line.trimAscii.split Char.isWhitespace).filter (· != "".toSlice)).toArray.map toString
+  let command ← words[0]?
+  let args := words[1:]
+  match command with
+    | "uci" => pure .uci
+    | "isready" => pure .isready
+    | "ucinewgame" => pure .ucinewgame
+    | "stop" => pure .stop
+    | "quit" => pure .quit
+    | "go" => pure $ .go args
+    | "position" =>
+        match (← args[0]?) with
+          | "startpos" => pure $ .position #[] args[2:].toArray
+          | "fen" => pure $ .position args[1:7].toArray args[9:].toArray
+          | _ => failure
+    | _ => failure
 
 inductive EngineToClientCommand : Type where
   | uciok
