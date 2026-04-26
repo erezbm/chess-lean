@@ -3,3 +3,5 @@
   - [x] Basic Board, Piece
   - [x] On `ucinewgame` initialize default position
 - [ ] Basic bot moving strategy: first eligible move
+  - [ ] Start with pawn
+    - [ ] Start with moving 1 ahead if tile is free
